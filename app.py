@@ -1,57 +1,86 @@
 import streamlit as st
+from urllib.parse import urlparse
+import time
 
-st.set_page_config(page_title="Ardham AI", layout="wide")
+st.set_page_config(page_title="Ardham AI - Universal Explainer", page_icon="🧠", layout="wide")
 
+# --- PREMIUM CSS - Nee image laga ---
 st.markdown("""
 <style>
-.stApp { background: #1A0A2E; }
-h1 { color: white !important; font-size: 3rem !important; }
-.purple { color: #8B5CF6; }
-.glass {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 12px;
+/* Hide Streamlit default menu */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Background */
+.stApp {
+    background: #1A0A2E;
+    background: linear-gradient(180deg, #1A0A2E 0%, #251240 100%);
 }
-.login-card {
-  background: #241445;
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid #3a2a60;
+
+/* Texts */
+h1, h2, h3 { color: #FFFFFF !important; font-weight: 800 !important; }
+p, span, label, small { color: #E5E7EB !important; }
+.purple-text { color: #A78BFA !important; }
+
+/* Glass Cards */
+.glass-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(8px);
+}
+.glass-card b { color: #fff; font-size: 14px; }
+.glass-card small { color: #9CA3AF !important; font-size: 12px; }
+
+/* Login Card */
+.login-box {
+    background: #241445;
+    border: 1px solid #3B2A67;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+/* Buttons */
+div[data-testid="stButton"] > button {
+    border-radius: 12px !important;
+    height: 48px;
+    font-weight: 600;
+    border: none;
+}
+div[data-testid="stButton"] > button[kind="primary"] {
+    background: linear-gradient(90deg, #EF4444, #F87171) !important;
+    color: white !important;
+}
+
+/* Input */
+input {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border-radius: 12px !important;
+    height: 48px !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-left, right = st.columns([1.1, 0.9])
+# Session state
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+if 'phone' not in st.session_state:
+    st.session_state.phone = ""
 
-with left:
-    st.markdown("🟢 <span style='color:#22c55e;font-size:13px'>LOGIN REQUIRED • SECURE ACCESS</span>", unsafe_allow_html=True)
-    st.markdown("# Edaina Website ni")
-    st.markdown("<h3 class='purple'>Mee Bhashalo</h3>", unsafe_allow_html=True)
-    st.markdown("# Ardham Chesukondi")
-    st.caption("Paste any link — nenu research chesi, simple ga chepta. Safe, translated, filtered. Login ayithe mee history, offline access anni save avthai.")
-    
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown('<div class="glass">🛡️ <b>Safe & Secure</b><br><small>SSL check, domain age, tracker scan</small></div>', unsafe_allow_html=True)
-        st.markdown('<div class="glass">🎙️ <b>Voice Guide</b><br><small>Voice lo vinandi, hands-free</small></div>', unsafe_allow_html=True)
-    with c2:
-        st.markdown('<div class="glass">🌐 <b>World Translate</b><br><small>Telugu, Hindi, English + 7 more</small></div>', unsafe_allow_html=True)
-        st.markdown('<div class="glass">📴 <b>Offline Access</b><br><small>Once researched, offline kuda chudocchu</small></div>', unsafe_allow_html=True)
+# ================= LOGIN SCREEN =================
+if not st.session_state.logged_in:
+    left, right = st.columns([1.15, 0.85], gap="large")
 
-with right:
-    st.markdown('<div class="login-card">', unsafe_allow_html=True)
-    st.markdown("### Ardham AI lo ki Swagatham")
-    st.caption("Login ayithe history, offline, voice anni save avthai. Mee data safe.")
-    
-    st.button("🔵 Google tho Login Avvandi", use_container_width=True)
-    st.markdown("<center style='color:#888;margin:10px'>— or —</center>", unsafe_allow_html=True)
-    
-    st.text_input("Phone", placeholder="98 765 43210", label_visibility="collapsed")
-    col_a, col_b = st.columns([1,1])
-    with col_a: st.button("OTP Pampinchu", use_container_width=True)
-    with col_b: st.button("Login Avvandi →", type="primary", use_container_width=True)
-    
-    st.caption("✅ Secure • 🌐 Languages • ⚡ Fast AI")
-    st.markdown('</div>', unsafe_allow_html=True)
+    with left:
+        st.markdown("<div style='color:#22c55e;font-size:13px;font-weight:600;margin-bottom:20px'>🟢 LOGIN REQUIRED • SECURE ACCESS</div>", unsafe_allow_html=True)
+        
+        st.markdown("<h1 style='font-size:52px;line-height:1.1;margin-bottom:0'>Edaina Website ni</h1>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#6B7280 !important;font-size:22px;font-weight:400;margin-top:8px'>Mee Bhashalo</h2>", unsafe_allow_html=True)
+        st.markdown("<h1 style='font-size:52px;line-height:1.1;margin-top:10px'>Ardham Chesukondi</h1>", unsafe_allow_html=True)
+        
+        st.markdown("<p style='color:#9CA3AF !important;margin-top:16px;font-size:14px'>Paste
