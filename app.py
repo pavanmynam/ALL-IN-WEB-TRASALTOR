@@ -1,75 +1,40 @@
-# Ardham AI - Universal Website & App Explainer
 import streamlit as st
-import requests
-from urllib.parse import urlparse
 import re
+from urllib.parse import urlparse
+from datetime import datetime
 
-def analyze_website(url):
-    parsed = urlparse(url)
-    domain = parsed.netloc
-    
-    # Basic safety checks
-    safety_score = 0
-    checks = []
-    
-    if "https" in url:
-        safety_score += 30
-        checks.append("✅ HTTPS secure connection undi - safe")
-    else:
-        checks.append("⚠️ HTTPS ledu - risk")
-    
-    if len(domain.split('.')) > 2:
-        checks.append("⚠️ Subdomain ekkuva undi - phishing check chesuko")
-    else:
-        safety_score += 20
-        checks.append("✅ Domain simple ga undi")
-    
-    # Fake age check (real API add cheyochu - WHOIS)
-    safety_score += 50
-    
-    return safety_score, checks
+st.set_page_config(page_title="Ardham AI - V2", page_icon="🧠", layout="wide")
 
-def explain_in_telugu(url, purpose):
-    if "shopping" in purpose.lower() or "【entity-amazon¦canonical_name=Amazon】" in url or "【entity-flipkart¦canonical_name=Flipkart】" in url:
-        return {
-            "what": "Idi shopping website/app. Products konukovachu.",
-            "how_to_use": "1. Account create chey, 2. Product search chey, 3. Reviews chudu, 4. COD unte better",
-            "safe": "Cash on Delivery vadite 90% safe",
-            "alternatives": "【entity-Amazon¦canonical_name=Amazon】, 【entity-Flipkart¦canonical_name=Flipkart】, 【entity-Meesho¦canonical_name=Meesho】"
-        }
-    elif "loan" in url or "finance" in url:
-        return {
-            "what": "Idi loan / finance app. Dabbu istharu ani cheptaru.",
-            "how_to_use": "Aadhar, PAN adagutharu. Interest chala ekkuva untadi. Chala apps fake.",
-            "safe": "RBI registered a ani check cheyali. Lekapote danger",
-            "alternatives": "Official bank apps - SBI YONO, 【entity-HDFC¦canonical_name=HDFC】"
-        }
-    else:
-        return {
-            "what": f"{url} - idi oka online service. User data collect chestadi.",
-            "how_to_use": "Link open chesi, permissions adigithe jagratha. Location, contacts adigithe avoid chey",
-            "safe": "First time aithe small data tho test chey",
-            "alternatives": "Similar service kosam Google lo 'alternative to' ani search chey"
-        }
+# --- Custom CSS for your Purple Design ---
+st.markdown("""
+<style>
+.stApp { background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%); }
+h1, h2, h3, p, label { color: white !important; }
+div[data-testid="stButton"] > button { background: linear-gradient(90deg, #8b5cf6, #3b82f6); color: white; border: none; border-radius: 12px; padding: 12px; width: 100%; }
+.glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+</style>
+""", unsafe_allow_html=True)
 
-# UI
-st.set_page_config(page_title="Ardham AI", page_icon="🧠")
-st.title("🧠 Ardham AI - Universal Explainer")
-st.write("Mana anukunna AI tool - Edaina link isthe mana bhasha lo chepthadi")
+# --- Session ---
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
 
-url = st.text_input("Website / App link ikkada paste chey:")
-if url:
-    score, checks = analyze_website(url)
-    st.subheader(f"Safety Score: {score}/100")
-    for c in checks:
-        st.write(c)
+# --- LOGIN SCREEN (Nee image la) ---
+if not st.session_state.logged_in:
+    col1, col2 = st.columns([1.2, 1])
+    with col1:
+        st.markdown("#### 🟢 LOGIN REQUIRED • SECURE ACCESS")
+        st.markdown("# Edaina Website ni\n### :violet[Mee Bhashalo]\n# Ardham Chesukondi")
+        st.write("Paste any link — nenu research chesi, simple ga chepta. Safe, translated, filtered. Login ayithe mee history, offline access anni save avthai.")
+        c1, c2 = st.columns(2)
+        with c1: st.markdown('<div class="glass">🛡️ <b>Safe & Secure</b><br><small>SSL check, domain age, tracker scan</small></div>', unsafe_allow_html=True)
+        with c2: st.markdown('<div class="glass">🌐 <b>World Translate</b><br><small>Telugu, Hindi, English + 7 more</small></div>', unsafe_allow_html=True)
+        c3, c4 = st.columns(2)
+        with c3: st.markdown('<div class="glass">🎤 <b>Voice Guide</b><br><small>Voice lo vinandi, hands-free</small></div>', unsafe_allow_html=True)
+        with c4: st.markdown('<div class="glass">📴 <b>Offline Access</b><br><small>Once researched, offline chudocchu</small></div>', unsafe_allow_html=True)
     
-    explanation = explain_in_telugu(url, url)
-    st.subheader("📖 Enti idi?")
-    st.write(explanation["what"])
-    st.subheader("🛠️ Ela vadali?")
-    st.write(explanation["how_to_use"])
-    st.subheader("🔒 Safe a?")
-    st.write(explanation["safe"])
-    st.subheader("🔄 Better Alternatives")
-    st.write(explanation["alternatives"])
+    with col2:
+        st.markdown('<div class="glass">', unsafe_allow_html=True)
+        st.subheader("Ardham AI lo ki Swagatham")
+        st.caption("Login ayithe history, offline, voice anni save avthai. Mee data safe.")
+        st
